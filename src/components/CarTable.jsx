@@ -1,64 +1,57 @@
 import React, { useState, useEffect } from "react";
 
 const CarTable = () => {
-  const [initialCarData, setInitialCarData] = useState([]);
-
+  const [initialCarData, setInitialCarData] = useState(() => {
+    const storedData = localStorage.getItem("carData");
+    return storedData ? JSON.parse(storedData) : [];
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCarData, setFilteredCarData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [visiblePages, setVisiblePages] = useState([]);
+  const [isInit, setIsInit] = useState(false);
 
   //Для окна Actions
   const [selectedCar, setSelectedCar] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
   const pageSize = 5; // Количество элементов на странице
 
-  useEffect(() => {
-    // Функция для получения данных из API
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://myfakeapi.com/api/cars/");
-        if (response.ok) {
-          const data = await response.json();
-          setInitialCarData(data.cars);
-        } else {
-          console.error("Error:", response.status);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  // Загрузка данных из локального хранилища при первом рендере
+  const [carData, setCarData] = useState(() => {
+    const storedData = localStorage.getItem("carData");
+    return storedData ? JSON.parse(storedData) : [];
+  });
 
-    fetchData();
-  }, []);
+  //Форма добавления автомобиля
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newCar, setNewCar] = useState({
+    car: "",
+    car_model: "",
+    car_vin: "",
+    car_color: "",
+    car_model_year: 0,
+    price: '$0',
+    availability: false,
+  });
 
-  useEffect(() => {
-    // Фильтрация данных по поисковому запросу
-    const filteredCars = initialCarData.filter((car) => {
-      const searchFields = [
-        car.car,
-        car.car_model,
-        car.car_vin,
-        car.car_color,
-        car.price,
-        car.car_model_year.toString(),
-        car.availability ? "available" : "not available",
-      ];
-      return searchFields.some((field) =>
-        field.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const handleAddModalClose = () => {
+    setIsAddModalOpen(false);
+    setNewCar({
+      car: "",
+      car_model: "",
+      car_vin: "",
+      car_color: "",
+      car_model_year: 0,
+      price:'$0',
+      availability: false,
     });
+  };
 
-    setTotalPages(Math.ceil(filteredCars.length / pageSize));
-
-    // Ограничение данных по текущей странице
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    setFilteredCarData(filteredCars.slice(startIndex, endIndex));
-  }, [currentPage, searchTerm]);
+  const handleAdd = () => {
+    setIsAddModalOpen(true);
+  };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -80,10 +73,6 @@ const CarTable = () => {
 
     setVisiblePages(visiblePageNumbers);
   };
-
-  useEffect(() => {
-    updateVisiblePages();
-  }, [currentPage, totalPages]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -133,53 +122,15 @@ const CarTable = () => {
     setIsDeleteModalOpen(false);
   };
 
-  //Форма добавления автомобиля
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newCar, setNewCar] = useState({
-    company: "",
-    model: "",
-    vin: "",
-    color: "",
-    year: 0,
-    price: 0,
-    availability: false,
-  });
-
-  const handleAdd = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const handleAddModalClose = () => {
-    setIsAddModalOpen(false);
-    setNewCar({
-      company: "",
-      model: "",
-      vin: "",
-      color: "",
-      year: 0,
-      price: 0,
-      availability: false,
-    });
-  };
-
-  const [carData, setCarData] = useState(() => {
-    // Загрузка данных из локального хранилища при первом рендере
-    const storedData = localStorage.getItem("carData");
-    return storedData ? JSON.parse(storedData) : [];
-  });
-
-  useEffect(() => {
-    // Сохранение данных в локальное хранилище при изменении carData
-    localStorage.setItem("carData", JSON.stringify(carData));
-  }, [carData]);
-
   const handleEditSubmit = (updatedCar) => {
     // Обновление данных выбранного автомобиля
     const updatedData = initialCarData.map((car) =>
       car.id === updatedCar.id ? updatedCar : car
     );
     setInitialCarData(updatedData);
+    toFilterData();
     setIsEditModalOpen(false);
+    localStorage.setItem("carData", JSON.stringify(updatedData));
   };
 
   const handleDeleteConfirm = () => {
@@ -188,16 +139,91 @@ const CarTable = () => {
       (car) => car.id !== selectedCar.id
     );
     setInitialCarData(updatedData);
+    toFilterData();
     setIsDeleteModalOpen(false);
-    console.log(initialCarData.length);
+    localStorage.setItem("carData", JSON.stringify(updatedData));
   };
 
-  const handleAddSubmit = (newCar) => {
+  const handleAddSubmit = () => {
     // Добавление нового автомобиля
-    const updatedData = [...initialCarData, { id: Date.now(), ...newCar }];
-    setInitialCarData(updatedData);
-    setIsAddModalOpen(false);
+
+    if (
+      newCar.car === "" ||
+      newCar.car_model === ""||
+      newCar.car_vin  === ""||
+      newCar.car_color === ""
+    ) {
+      return;
+    } else {
+      const updatedData = [{ id: Date.now(), ...newCar }, ...initialCarData];
+      setInitialCarData(updatedData);
+      handleAddModalClose()
+      setIsAddModalOpen(false);
+      toFilterData();
+      localStorage.setItem("carData", JSON.stringify(updatedData));
+    }
   };
+
+  const toFilterData = () => {
+    isInit ? setIsInit(false) : setIsInit(true);
+  };
+
+  useEffect(() => {
+    // Функция для получения данных из API
+    if (initialCarData) {
+      console.log(initialCarData.length);
+    } else {
+      const fetchData = async () => {
+        try {
+          const response = await fetch("https://myfakeapi.com/api/cars/");
+          if (response.ok) {
+            const data = await response.json();
+            setInitialCarData(data.cars);
+            toFilterData();
+          } else {
+            console.error("Error:", response.status);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+      fetchData();
+    }
+  }, []);
+
+  useEffect(() => {
+    // Фильтрация данных по поисковому запросу
+    const filteredCars = initialCarData.filter((car) => {
+      const searchFields = [
+        car.car,
+        car.car_model,
+        car.car_vin,
+        car.car_color,
+        car.price,
+        car.car_model_year.toString(),
+        car.availability ? "available" : "not available",
+      ];
+      return searchFields.some((field) =>
+        field.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+
+    setTotalPages(Math.ceil(filteredCars.length / pageSize));
+
+    // Ограничение данных по текущей странице
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    setFilteredCarData(filteredCars.slice(startIndex, endIndex));
+  }, [isInit, currentPage, searchTerm]);
+
+  useEffect(() => {
+    updateVisiblePages();
+  }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    // Сохранение данных в локальное хранилище при изменении initialCarData
+    localStorage.setItem("carData", JSON.stringify(initialCarData));
+  }, [initialCarData]);
 
   return (
     <div>
@@ -260,38 +286,48 @@ const CarTable = () => {
           <form onSubmit={(e) => e.preventDefault()}>
             <label>
               Company:
-              <input type="text" value={selectedCar.company} disabled />
+              <input
+                type="text"
+                value={selectedCar.car}
+                disabled
+              />
             </label>
             <label>
               Model:
-              <input type="text" value={selectedCar.model} disabled />
+              <input type="text" value={selectedCar.car_model} 
+                               disabled />
             </label>
             <label>
               VIN:
-              <input type="text" value={selectedCar.vin} disabled />
+              <input type="text" value={selectedCar.car_vin} 
+                               disabled />
             </label>
             <label>
               Color:
               <input
                 type="text"
-                value={selectedCar.color}
+                value={selectedCar.car_color}
+                placeholder="Enter color"
                 onChange={(e) =>
                   setSelectedCar((prevCar) => ({
                     ...prevCar,
-                    color: e.target.value,
+                    car_color: e.target.value,
                   }))
                 }
               />
             </label>
             <label>
+              Year:
+              <input type="text" value={selectedCar.car_model_year} disabled />
+            </label>
+            <label>
               Price:
               <input
                 type="number"
-                value={selectedCar.price}
+                value={selectedCar.price.slice(1)}
                 onChange={(e) =>
                   setSelectedCar((prevCar) => ({
-                    ...prevCar,
-                    price: e.target.value,
+                    ...prevCar, price: '$' + e.target.value,
                   }))
                 }
               />
@@ -342,11 +378,12 @@ const CarTable = () => {
               Company:
               <input
                 type="text"
-                value={newCar.company}
+                placeholder="Enter company name"
+                value={newCar.car}
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    company: e.target.value,
+                    car: e.target.value,
                   }))
                 }
               />
@@ -355,11 +392,13 @@ const CarTable = () => {
               Model:
               <input
                 type="text"
-                value={newCar.model}
+                value={newCar.car_model}
+                placeholder="Enter model name"
+
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    model: e.target.value,
+                    car_model: e.target.value,
                   }))
                 }
               />
@@ -368,11 +407,13 @@ const CarTable = () => {
               VIN:
               <input
                 type="text"
-                value={newCar.vin}
+                value={newCar.car_vin}
+                placeholder="Enter VIN number"
+
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    vin: e.target.value,
+                    car_vin: e.target.value,
                   }))
                 }
               />
@@ -381,11 +422,13 @@ const CarTable = () => {
               Color:
               <input
                 type="text"
-                value={newCar.color}
+                value={newCar.car_color}
+                placeholder="Enter color"
+
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    color: e.target.value,
+                    car_color: e.target.value,
                   }))
                 }
               />
@@ -394,11 +437,11 @@ const CarTable = () => {
               Year:
               <input
                 type="number"
-                value={newCar.year}
+                value={newCar.car_model_year}
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    year: e.target.value,
+                    car_model_year: e.target.value,
                   }))
                 }
               />
@@ -407,13 +450,14 @@ const CarTable = () => {
               Price:
               <input
                 type="number"
-                value={newCar.price}
+                value={newCar.price.slice(1)}
                 onChange={(e) =>
                   setNewCar((prevCar) => ({
                     ...prevCar,
-                    price: e.target.value,
+                    price: '$'+ e.target.value,
                   }))
                 }
+                
               />
             </label>
             <label>
@@ -455,8 +499,6 @@ const CarTable = () => {
 
         <button onClick={goToNextPages}>&gt;</button>
       </div>
-
-   
     </div>
   );
 };
