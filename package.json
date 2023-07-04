@@ -11,7 +11,8 @@
   "dependencies": {
     "material-ui-popup-state": "^5.0.9",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-select": "^5.7.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",

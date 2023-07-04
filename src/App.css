@@ -40,7 +40,6 @@ input {
   text-align: left;
 }
 .empty {
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -77,6 +76,7 @@ button:disabled {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
+  z-index: 1;
 }
 .modal-window-content {
   padding: 0 24px 12px;
@@ -89,9 +89,9 @@ form {
   display: flex;
   flex-direction: column;
 }
-.error-message{
+.error-message {
   color: red;
 }
-select{
-  cursor: pointer;
+.actions-td {
+  overflow: visible;
 }

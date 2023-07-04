@@ -18,7 +18,7 @@ const CarsTableBody = ({
           <td>{car.car_model_year}</td>
           <td>{car.price}</td>
           <td>{car.availability ? AVAILABLE : NOT_AVAILABLE}</td>
-          <td>
+          <td className="actions-td">
             <Actions
               car={car}
               handleEdit={handleEdit}

@@ -6,7 +6,8 @@ const Search = ({ value, onChange }) => {
   };
 
   return (
-    <input className="search-input"
+    <input
+      className="search-input"
       type="text"
       value={value}
       onChange={handleInputChange}
