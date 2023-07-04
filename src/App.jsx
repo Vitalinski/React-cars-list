@@ -127,20 +127,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (!initialCarData) {
+    if (!initialCarData.length) {
       const fetchData = async () => {
-        try {
-          const response = await fetch("https://myfakeapi.com/api/cars/");
-          if (response.ok) {
-            const data = await response.json();
+        fetch("https://myfakeapi.com/api/cars/")
+          .then((response) => response.json())
+          .then((data) => {
             setInitialCarData(data.cars);
             toFilterData();
-          } else {
-            console.error("Error:", response.status);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
+          })
+          .catch((error) => console.log("Error:", error));
       };
       fetchData();
     }
