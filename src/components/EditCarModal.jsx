@@ -34,7 +34,7 @@ const EditCarModal = ({
                   value={selectedCar.car_color}
                   placeholder="Enter color"
                   onChange={(e) =>
-                    handleInputChange("car_color", e.target.value)
+                    handleInputChange("car_color", e.target.value.replace(/\s+/g, ' '))
                   }
                 />
               </label>
