@@ -9,7 +9,7 @@ const Actions = ({ car, handleEdit, handleDelete }) => {
     } else if (action === "delete") {
       handleDelete(car);
     }
-    action = "select action";
+    selectedOption.label = "Select action";
   };
 
   const options = [
