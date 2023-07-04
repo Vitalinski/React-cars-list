@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
-
+const AddCarModal = ({ isOpen, onClose, onSubmit }) => {
   const DEFAULT_CAR_MODEL = {
     car: "",
     car_model: "",
@@ -12,32 +11,28 @@ const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
     availability: false,
   };
 
-  const [isFieldsEmpty, setIsFieldsEmpty]= useState(false)
+  const [isFieldsEmpty, setIsFieldsEmpty] = useState(false);
   const [newCar, setNewCar] = useState(DEFAULT_CAR_MODEL);
-  
+
   const handleInputChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
     setNewCar((prevCar) => ({ ...prevCar, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (Object.values(newCar).some((car) => car === ''||car === ' ')){
-      setIsFieldsEmpty(true)
-
+    if (Object.values(newCar).some((car) => car === "" || car === " ")) {
+      setIsFieldsEmpty(true);
+    } else {
+      onSubmit(newCar);
+      setNewCar(DEFAULT_CAR_MODEL);
+      setIsFieldsEmpty(false);
     }
-    else{
-    onSubmit(newCar);
-    setNewCar(DEFAULT_CAR_MODEL);
-        setIsFieldsEmpty(false)
-
-    }
-    
   };
   const handleClose = (e) => {
     e.preventDefault();
     setNewCar(DEFAULT_CAR_MODEL);
-    setIsFieldsEmpty(false)
+    setIsFieldsEmpty(false);
 
     onClose();
   };
@@ -58,7 +53,7 @@ const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
                   onChange={(e) =>
                     setNewCar((prevCar) => ({
                       ...prevCar,
-                      car: e.target.value.replace(/\s+/g, ' '),
+                      car: e.target.value.replace(/\s+/g, " "),
                     }))
                   }
                 />
@@ -72,7 +67,7 @@ const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
                   onChange={(e) =>
                     setNewCar((prevCar) => ({
                       ...prevCar,
-                      car_model: e.target.value.replace(/\s+/g, ' '),
+                      car_model: e.target.value.replace(/\s+/g, " "),
                     }))
                   }
                 />
@@ -86,7 +81,7 @@ const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
                   onChange={(e) =>
                     setNewCar((prevCar) => ({
                       ...prevCar,
-                      car_vin: e.target.value.replace(/\s+/g, ' '),
+                      car_vin: e.target.value.replace(/\s+/g, " "),
                     }))
                   }
                 />
@@ -100,7 +95,7 @@ const AddCarModal = ({  isOpen, onClose, onSubmit }) => {
                   onChange={(e) =>
                     setNewCar((prevCar) => ({
                       ...prevCar,
-                      car_color: e.target.value.replace(/\s+/g, ' '),
+                      car_color: e.target.value.replace(/\s+/g, " "),
                     }))
                   }
                 />

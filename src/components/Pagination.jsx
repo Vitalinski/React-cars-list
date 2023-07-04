@@ -8,7 +8,7 @@ const Pagination = ({
   goToNextPages,
 }) => {
   if (visiblePages.length === 0) {
-    return ;
+    return;
   }
   return (
     <div>

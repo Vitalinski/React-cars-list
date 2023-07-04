@@ -1,9 +1,9 @@
 import "./App.css";
-import CarTable from "./components/CarTable";
+import CarTable from "./components/tableComponents/CarsTable";
 import React, { useState, useEffect } from "react";
-import AddCarModal from "./components/AddCarModal";
-import DeleteCarModal from "./components/DeleteCarModal";
-import EditCarModal from "./components/EditCarModal";
+import AddCarModal from "./components/modalWindows/AddCarModal";
+import DeleteCarModal from "./components/modalWindows/DeleteCarModal";
+import EditCarModal from "./components/modalWindows/EditCarModal";
 import Pagination from "./components/Pagination";
 import Search from "./components/Search";
 
@@ -24,10 +24,9 @@ const App = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const MIN_PAGE_NUMBER = 1;
-  const  PAGE_SIZE = 8;
+  const PAGE_SIZE = 8;
   const MAX_VISIBLE_PAGES = 5;
- 
-  
+
   const handleAddModalClose = () => {
     setIsAddModalOpen(false);
   };
@@ -42,7 +41,6 @@ const App = () => {
   };
 
   const updateVisiblePages = () => {
-    
     const total = Math.min(MAX_VISIBLE_PAGES, totalPages);
 
     let startPage = currentPage - Math.floor(total / 2);
@@ -63,8 +61,8 @@ const App = () => {
 
   const goToPreviousPages = () => {
     let previousPage = currentPage - MAX_VISIBLE_PAGES;
-    if (previousPage < MIN_PAGE_NUMBER ) {
-      previousPage = MIN_PAGE_NUMBER ;
+    if (previousPage < MIN_PAGE_NUMBER) {
+      previousPage = MIN_PAGE_NUMBER;
     }
     setCurrentPage(previousPage);
   };
@@ -116,12 +114,12 @@ const App = () => {
   };
 
   const handleAddSubmit = (newCar) => {
-      const updatedData = [{ id: Date.now(), ...newCar }, ...initialCarData];
-      setInitialCarData(updatedData);
-      handleAddModalClose();
-      setIsAddModalOpen(false);
-      toFilterData();
-      localStorage.setItem("carData", JSON.stringify(updatedData));
+    const updatedData = [{ id: Date.now(), ...newCar }, ...initialCarData];
+    setInitialCarData(updatedData);
+    handleAddModalClose();
+    setIsAddModalOpen(false);
+    toFilterData();
+    localStorage.setItem("carData", JSON.stringify(updatedData));
   };
 
   const toFilterData = () => {
@@ -164,10 +162,10 @@ const App = () => {
       );
     });
 
-    setTotalPages(Math.ceil(filteredCars.length /  PAGE_SIZE));
+    setTotalPages(Math.ceil(filteredCars.length / PAGE_SIZE));
 
-    const startIndex = (currentPage - 1) *  PAGE_SIZE;
-    const endIndex = startIndex +  PAGE_SIZE;
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
     setFilteredCarData(filteredCars.slice(startIndex, endIndex));
   }, [isInit, currentPage, searchTerm]);
 

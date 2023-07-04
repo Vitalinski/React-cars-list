@@ -8,10 +8,9 @@ const EditCarModal = ({
   handleInputChange,
 }) => {
   return (
-    <div  >
+    <div>
       {isOpen && (
         <div className="modal-window">
-          
           <div className="modal-window-content">
             <h2>Edit Car</h2>
             <form onSubmit={(e) => e.preventDefault()}>
@@ -34,13 +33,20 @@ const EditCarModal = ({
                   value={selectedCar.car_color}
                   placeholder="Enter color"
                   onChange={(e) =>
-                    handleInputChange("car_color", e.target.value.replace(/\s+/g, ' '))
+                    handleInputChange(
+                      "car_color",
+                      e.target.value.replace(/\s+/g, " ")
+                    )
                   }
                 />
               </label>
               <label>
                 Year:
-                <input type="text" value={selectedCar.car_model_year} disabled />
+                <input
+                  type="text"
+                  value={selectedCar.car_model_year}
+                  disabled
+                />
               </label>
               <label>
                 Price:
@@ -50,7 +56,7 @@ const EditCarModal = ({
                   onChange={(e) =>
                     handleInputChange(
                       "price",
-                      e.target.value > 0 ? "$" + e.target.value : "$0",
+                      e.target.value > 0 ? "$" + e.target.value : "$0"
                     )
                   }
                 />
