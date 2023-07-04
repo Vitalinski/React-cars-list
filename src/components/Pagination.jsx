@@ -7,6 +7,9 @@ const Pagination = ({
   handlePageChange,
   goToNextPages,
 }) => {
+  if (visiblePages.length === 0) {
+    return ;
+  }
   return (
     <div>
       <button onClick={goToPreviousPages}>&lt;</button>

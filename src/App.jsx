@@ -22,8 +22,12 @@ const App = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const pageSize = 5;
 
+  const MIN_PAGE_NUMBER = 1;
+  const  PAGE_SIZE = 8;
+  const MAX_VISIBLE_PAGES = 5;
+ 
+  
   const handleAddModalClose = () => {
     setIsAddModalOpen(false);
   };
@@ -33,17 +37,16 @@ const App = () => {
   };
 
   const handleSearch = (value) => {
-  
     setSearchTerm(value);
-    setCurrentPage(1);
+    setCurrentPage(MIN_PAGE_NUMBER);
   };
 
   const updateVisiblePages = () => {
-    const totalVisiblePages = 5;
-    const total = Math.min(totalVisiblePages, totalPages);
+    
+    const total = Math.min(MAX_VISIBLE_PAGES, totalPages);
 
     let startPage = currentPage - Math.floor(total / 2);
-    startPage = Math.max(startPage, 1);
+    startPage = Math.max(startPage, MIN_PAGE_NUMBER);
     startPage = Math.min(startPage, totalPages - total + 1);
 
     const visiblePageNumbers = Array.from(
@@ -59,17 +62,15 @@ const App = () => {
   };
 
   const goToPreviousPages = () => {
-    const maxVisiblePages = 10;
-    let previousPage = currentPage - maxVisiblePages;
-    if (previousPage <= 0) {
-      previousPage = 1;
+    let previousPage = currentPage - MAX_VISIBLE_PAGES;
+    if (previousPage < MIN_PAGE_NUMBER ) {
+      previousPage = MIN_PAGE_NUMBER ;
     }
     setCurrentPage(previousPage);
   };
 
   const goToNextPages = () => {
-    const maxVisiblePages = 10;
-    let nextPage = currentPage + maxVisiblePages;
+    let nextPage = currentPage + MAX_VISIBLE_PAGES;
     if (nextPage > totalPages) {
       nextPage = totalPages;
     }
@@ -115,21 +116,12 @@ const App = () => {
   };
 
   const handleAddSubmit = (newCar) => {
-    if (
-      newCar.car === "" ||
-      newCar.car_model === "" ||
-      newCar.car_vin === "" ||
-      newCar.car_color === ""
-    ) {
-      return;
-    } else {
       const updatedData = [{ id: Date.now(), ...newCar }, ...initialCarData];
       setInitialCarData(updatedData);
       handleAddModalClose();
       setIsAddModalOpen(false);
       toFilterData();
       localStorage.setItem("carData", JSON.stringify(updatedData));
-    }
   };
 
   const toFilterData = () => {
@@ -172,10 +164,10 @@ const App = () => {
       );
     });
 
-    setTotalPages(Math.ceil(filteredCars.length / pageSize));
+    setTotalPages(Math.ceil(filteredCars.length /  PAGE_SIZE));
 
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
+    const startIndex = (currentPage - 1) *  PAGE_SIZE;
+    const endIndex = startIndex +  PAGE_SIZE;
     setFilteredCarData(filteredCars.slice(startIndex, endIndex));
   }, [isInit, currentPage, searchTerm]);
 
@@ -188,16 +180,17 @@ const App = () => {
   }, [initialCarData]);
 
   return (
-    <div>
-      <AddCarModal
-        isOpen={isAddModalOpen}
-        onClose={handleAddModalClose}
-        onSubmit={handleAddSubmit}
-      />
-      <button onClick={handleAdd}>Add Car</button>
+    <div className="main-container">
+      <div className="header">
+        <AddCarModal
+          isOpen={isAddModalOpen}
+          onClose={handleAddModalClose}
+          onSubmit={handleAddSubmit}
+        />
 
-      <Search value={searchTerm} onChange={handleSearch} />
-
+        <Search value={searchTerm} onChange={handleSearch} />
+        <button onClick={handleAdd}>Add car</button>
+      </div>
       <CarTable
         data={filteredCarData}
         handleEdit={handleEdit}
