@@ -3,7 +3,7 @@ import Select from "react-select";
 
 const Actions = ({ car, handleEdit, handleDelete }) => {
   const handleActionChange = (selectedOption) => {
-    const action = selectedOption.value;
+    let action = selectedOption.value;
     if (action === "edit") {
       handleEdit(car);
     } else if (action === "delete") {
